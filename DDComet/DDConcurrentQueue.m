@@ -1,17 +1,18 @@
 
 #import "DDConcurrentQueue.h"
+#import <objc/objc-auto.h>
 #import <libkern/OSAtomic.h>
 
 
 @interface DDConcurrentQueueNode : NSObject
 {
 @private
-    id m_object;
-	DDConcurrentQueueNode * volatile m_next;
+    id __strong m_object;
+	DDConcurrentQueueNode * volatile __strong m_next;
 }
 
-@property (nonatomic, retain) id object;
-@property (nonatomic, readonly) DDConcurrentQueueNode *next;
+@property (nonatomic, strong) id object;
+@property (nonatomic, strong, readonly) DDConcurrentQueueNode *next;
 
 - (BOOL)compareNext:(DDConcurrentQueueNode *)old andSet:(DDConcurrentQueueNode *)new;
 
@@ -25,21 +26,15 @@
 {
 	if ((self = [super init]))
 	{
-		m_object = [object retain];
+		m_object = object;
+        m_next = nil;
 	}
 	return self;
 }
 
-- (void)dealloc
-{
-	[m_object release];
-	[m_next release];
-	[super dealloc];
-}
-
 - (BOOL)compareNext:(DDConcurrentQueueNode *)old andSet:(DDConcurrentQueueNode *)new
 {
-	return OSAtomicCompareAndSwapPtrBarrier(old, new, (void * volatile *)&m_next);
+	return OSAtomicCompareAndSwapPtrBarrier((__bridge void *)(old), (__bridge void *)(new), (void * volatile)&m_next);
 }
 
 @end
@@ -58,6 +53,7 @@
 	if ((self = [super init]))
 	{
 		DDConcurrentQueueNode *node = [[DDConcurrentQueueNode alloc] init];
+        //CFRetain((__bridge CFTypeRef)node);
 		m_head = node;
 		m_tail = node;
 	}
@@ -67,6 +63,7 @@
 - (void)addObject:(id)object
 {
 	DDConcurrentQueueNode *node = [[DDConcurrentQueueNode alloc] initWithObject:object];
+    CFRetain((__bridge CFTypeRef)node);
 	while (YES)
 	{
 		DDConcurrentQueueNode *tail = m_tail;
@@ -95,8 +92,8 @@
 {
 	while (YES)
 	{
-		DDConcurrentQueueNode *head = m_head;
-		DDConcurrentQueueNode *tail = m_tail;
+		DDConcurrentQueueNode *head = (DDConcurrentQueueNode*)m_head;
+		DDConcurrentQueueNode *tail = (DDConcurrentQueueNode*)m_tail;
 		DDConcurrentQueueNode *first = head.next;
 		if (head == m_head)
 		{
@@ -109,7 +106,8 @@
 			}
 			else if ([self compareHead:head andSet:first])
 			{
-				id object = [[first.object retain] autorelease];
+				id object = first.object;
+                //CFRelease((__bridge CFTypeRef) head);
 				if (object != nil)
 				{
 					first.object = nil;
@@ -128,12 +126,12 @@
 
 - (BOOL)compareHead:(DDConcurrentQueueNode *)old andSet:(DDConcurrentQueueNode *)new
 {
-	return OSAtomicCompareAndSwapPtrBarrier(old, new, (void * volatile *)&m_head);
+	return OSAtomicCompareAndSwapPtrBarrier((__bridge void *)old, (__bridge void *)new, (volatile void *) &m_head);
 }
 
 - (BOOL)compareTail:(DDConcurrentQueueNode *)old andSet:(DDConcurrentQueueNode *)new
 {
-	return OSAtomicCompareAndSwapPtrBarrier(old, new, (void * volatile *)&m_tail);
+	return OSAtomicCompareAndSwapPtrBarrier((__bridge void *)old, (__bridge void *)new, (volatile void *)&m_tail);
 }
 
 @end

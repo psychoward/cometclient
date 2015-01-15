@@ -1,5 +1,6 @@
 
 #import "DDCometMessage.h"
+#import <objc/runtime.h>
 
 @interface NSDate (ISO8601)
 
@@ -9,19 +10,28 @@
 @end
 
 @implementation NSDate (ISO8601)
+static __strong NSDateFormatter* FMT;
+
++(void)initFormat
+{
+    if (!FMT) {
+        NSDateFormatter *fmt = [[NSDateFormatter alloc] init];
+        fmt.timeZone = [NSTimeZone timeZoneForSecondsFromGMT:0];
+        [fmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss'Z'"];
+        FMT = fmt;
+    }
+}
 
 + (NSDate *)dateWithISO8601String:(NSString *)string
 {
-	NSDateFormatter *fmt = [[[NSDateFormatter alloc] init] autorelease];
-	[fmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
-	return [fmt dateFromString:string];
+	[NSDate initFormat];
+    return [FMT dateFromString:string];
 }
 
 - (NSString *)ISO8601Representation
 {
-	NSDateFormatter *fmt = [[[NSDateFormatter alloc] init] autorelease];
-	[fmt setDateFormat:@"yyyy-MM-dd'T'HH:mm:ss"];
-	return [fmt stringFromDate:self];
+    [NSDate initFormat];
+    return [FMT stringFromDate:self];
 }
 
 @end
@@ -38,15 +48,15 @@
 + (NSError *)errorWithBayeuxFormat:(NSString *)string
 {
 	NSArray *components = [string componentsSeparatedByString:@":"];
-	NSInteger code = [[components objectAtIndex:0] integerValue];
-	NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[components objectAtIndex:2], NSLocalizedDescriptionKey, nil];
-	return [[[NSError alloc] initWithDomain:@"" code:code userInfo:userInfo] autorelease];
+	NSInteger code = [components[0] integerValue];
+	NSDictionary *userInfo = @{NSLocalizedDescriptionKey: components[2]};
+	return [[NSError alloc] initWithDomain:@"" code:code userInfo:userInfo];
 }
 
 - (NSString *)bayeuxFormat
 {
 	NSString *args = @"";
-	NSArray *components = [NSArray arrayWithObjects:[NSString stringWithFormat:@"%d", [self code]], args, [self localizedDescription], nil];
+	NSArray *components = @[[NSString stringWithFormat:@"%d", [self code]], args, [self localizedDescription]];
 	return [components componentsJoinedByString:@":"];
 }
 
@@ -69,28 +79,10 @@
 	error = m_error,
 	ext = m_ext;
 
-- (void)dealloc
-{
-    [m_channel release];
-	[m_version release];
-	[m_minimumVersion release];
-	[m_supportedConnectionTypes release];
-	[m_clientID release];
-	[m_advice release];
-	[m_connectionType release];
-	[m_ID release];
-	[m_timestamp release];
-	[m_data release];
-	[m_successful release];
-	[m_subscription release];
-	[m_error release];
-	[m_ext release];
-    [super dealloc];
-}
 
 + (DDCometMessage *)messageWithChannel:(NSString *)channel
 {
-	DDCometMessage *message = [[[DDCometMessage alloc] init] autorelease];
+	DDCometMessage *message = [[DDCometMessage alloc] init];
 	message.channel = channel;
 	return message;
 }
@@ -101,10 +93,10 @@
 
 + (DDCometMessage *)messageWithJson:(NSDictionary *)jsonData
 {
-	DDCometMessage *message = [[[DDCometMessage alloc] init] autorelease];
+	DDCometMessage *message = [[DDCometMessage alloc] init];
 	for (NSString *key in [jsonData keyEnumerator])
 	{
-		id object = [jsonData objectForKey:key];
+		id object = jsonData[key];
 		
 		if ([key isEqualToString:@"channel"])
 			message.channel = object;
@@ -142,33 +134,38 @@
 {
 	NSMutableDictionary *dict = [NSMutableDictionary dictionary];
 	if (m_channel)
-		[dict setObject:m_channel forKey:@"channel"];
+		dict[@"channel"] = m_channel;
 	if (m_version)
-		[dict setObject:m_version forKey:@"version"];
+		dict[@"version"] = m_version;
 	if (m_minimumVersion)
-		[dict setObject:m_minimumVersion forKey:@"minimumVersion"];
+		dict[@"minimumVersion"] = m_minimumVersion;
 	if (m_supportedConnectionTypes)
-		[dict setObject:m_supportedConnectionTypes forKey:@"supportedConnectionTypes"];
+		dict[@"supportedConnectionTypes"] = m_supportedConnectionTypes;
 	if (m_clientID)
-		[dict setObject:m_clientID forKey:@"clientId"];
+		dict[@"clientId"] = m_clientID;
 	if (m_advice)
-		[dict setObject:m_advice forKey:@"advice"];
+		dict[@"advice"] = m_advice;
 	if (m_connectionType)
-		[dict setObject:m_connectionType forKey:@"connectionType"];
+		dict[@"connectionType"] = m_connectionType;
 	if (m_ID)
-		[dict setObject:m_ID forKey:@"id"];
+		dict[@"id"] = m_ID;
 	if (m_timestamp)
-		[dict setObject:[m_timestamp ISO8601Representation] forKey:@"timestamp"];
-	if (m_data)
-		[dict setObject:m_data forKey:@"data"];
+		dict[@"timestamp"] = [m_timestamp ISO8601Representation];
+	if (m_data) {
+        if ([m_data respondsToSelector:@selector(asDictionary)]) {
+            dict[@"data"] = [m_data performSelector:@selector(asDictionary)];
+        } else {
+            dict[@"data"] = m_data;
+        }
+    }
 	if (m_successful)
-		[dict setObject:m_successful forKey:@"successful"];
+		dict[@"successful"] = m_successful;
 	if (m_subscription)
-		[dict setObject:m_subscription forKey:@"subscription"];
+		dict[@"subscription"] = m_subscription;
 	if (m_error)
-		[dict setObject:[m_error bayeuxFormat] forKey:@"error"];
+		dict[@"error"] = [m_error bayeuxFormat];
 	if (m_ext)
-		[dict setObject:m_ext forKey:@"ext"];
+		dict[@"ext"] = m_ext;
 	return dict;
 }
 

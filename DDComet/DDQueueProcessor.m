@@ -1,5 +1,6 @@
 
 #import "DDQueueProcessor.h"
+#import <objc/message.h>
 
 
 void DDQueueProcessorPerform(void *info);
@@ -10,7 +11,7 @@ void DDQueueProcessorPerform(void *info);
 									   target:(id)target
 									 selector:(SEL)selector
 {
-	DDQueueProcessor *processor = [[[DDQueueProcessor alloc] initWithTarget:target selector:selector] autorelease];
+	DDQueueProcessor *processor = [[DDQueueProcessor alloc] initWithTarget:target selector:selector];
 	[queue setDelegate:processor];
 	[processor scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
 	return processor;
@@ -25,7 +26,7 @@ void DDQueueProcessorPerform(void *info);
 		
 		CFRunLoopSourceContext context =
 		{
-			0, self, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			0, (__bridge void *)(self), NULL, NULL, NULL, NULL, NULL, NULL, NULL,
 			DDQueueProcessorPerform
 		};
 		
@@ -37,23 +38,18 @@ void DDQueueProcessorPerform(void *info);
 - (void)dealloc
 {
 	if (m_runLoop)
-		CFRunLoopRemoveSource([m_runLoop getCFRunLoop], m_source, (CFStringRef)m_mode);
+		CFRunLoopRemoveSource([m_runLoop getCFRunLoop], m_source, (__bridge CFStringRef)m_mode);
 
-	[m_runLoop release];
-	[m_mode release];
 	CFRelease(m_source);
-    [super dealloc];
 }
 
 - (void)scheduleInRunLoop:(NSRunLoop *)runLoop forMode:(NSString *)mode
 {
 	@synchronized(self)
 	{
-		CFRunLoopAddSource([runLoop getCFRunLoop], m_source, (CFStringRef)mode);
-		[m_runLoop release];
-		m_runLoop = [runLoop retain];
-		[m_mode release];
-		m_mode = [mode retain];
+		CFRunLoopAddSource([runLoop getCFRunLoop], m_source, (__bridge CFStringRef)mode);
+		m_runLoop = runLoop;
+		m_mode = mode;
 	}
 }
 
@@ -65,13 +61,14 @@ void DDQueueProcessorPerform(void *info);
 
 - (void)makeTargetPeformSelector
 {
-	[m_target performSelector:m_selector];
+    objc_msgSend(m_target, m_selector);
+//	[m_target performSelector:m_selector];
 }
 
 @end
 
 void DDQueueProcessorPerform(void *info)
 {
-	DDQueueProcessor *processor = info;
+	DDQueueProcessor *processor = (__bridge DDQueueProcessor *)(info);
 	[processor makeTargetPeformSelector];
 }
