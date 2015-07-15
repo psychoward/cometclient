@@ -112,7 +112,7 @@ static void * const delegateKey = (void*)&delegateKey;
 		m_incomingQueue = [[DDConcurrentQueue alloc] init];
         m_reconnectOnClientExpired = YES;
         m_persistentSubscriptions = YES;
-        _maxServerTimeDifference = kCometClientDefaultMaxTimestampDifference;
+        //_maxServerTimeDifference = kCometClientDefaultMaxTimestampDifference;
 	}
 	return self;
 }
