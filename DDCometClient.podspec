@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name         = "DDCometClient"
-    s.version      = "1.0.2"
+    s.version      = "1.0.3"
     s.summary      = "Objective-C comet client using the Bayeux protocol updated for ARC and iOS 8"
     s.homepage     = "https://github.com/psychoward/cometclient"
     s.license      = 'MIT'

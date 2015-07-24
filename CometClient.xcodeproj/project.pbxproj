@@ -33,6 +33,7 @@
 		4656900B132DA5FF004086EE /* DDCometSubscription.m in Sources */ = {isa = PBXBuildFile; fileRef = 46569009132DA5FE004086EE /* DDCometSubscription.m */; };
 		4656900E132DD5A6004086EE /* DDCometLongPollingTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4656900D132DD5A5004086EE /* DDCometLongPollingTransport.m */; };
 		4656900F132DD5A6004086EE /* DDCometLongPollingTransport.m in Sources */ = {isa = PBXBuildFile; fileRef = 4656900D132DD5A5004086EE /* DDCometLongPollingTransport.m */; };
+		494B05401B62A7F600C229EE /* ISO8601DateFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 494B053F1B62A7F600C229EE /* ISO8601DateFormatter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +86,8 @@
 		46AFA53013443B9900B4DCA4 /* dojo.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = dojo.js; sourceTree = "<group>"; };
 		46AFA5311344450000B4DCA4 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 		494B05031B6283D500C229EE /* DDCometClient.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = DDCometClient.podspec; sourceTree = "<group>"; };
+		494B053E1B62A7F600C229EE /* ISO8601DateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ISO8601DateFormatter.h; path = DDComet/ISO8601DateFormatter.h; sourceTree = "<group>"; };
+		494B053F1B62A7F600C229EE /* ISO8601DateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ISO8601DateFormatter.m; path = DDComet/ISO8601DateFormatter.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -192,6 +195,8 @@
 		46568FFB132C030B004086EE /* DDComet */ = {
 			isa = PBXGroup;
 			children = (
+				494B053E1B62A7F600C229EE /* ISO8601DateFormatter.h */,
+				494B053F1B62A7F600C229EE /* ISO8601DateFormatter.m */,
 				461CD431132F368F00A6BE4F /* DDArrayQueue.h */,
 				461CD432132F368F00A6BE4F /* DDArrayQueue.m */,
 				46568FFC132C0500004086EE /* DDCometClient.h */,
@@ -332,6 +337,7 @@
 				46568FA9132C01AD004086EE /* CometClientAppDelegate.m in Sources */,
 				46568FAF132C01AD004086EE /* MainViewController.m in Sources */,
 				46568FFE132C0500004086EE /* DDCometClient.m in Sources */,
+				494B05401B62A7F600C229EE /* ISO8601DateFormatter.m in Sources */,
 				46569002132C27BD004086EE /* DDCometMessage.m in Sources */,
 				4656900A132DA5FF004086EE /* DDCometSubscription.m in Sources */,
 				4656900E132DD5A6004086EE /* DDCometLongPollingTransport.m in Sources */,
