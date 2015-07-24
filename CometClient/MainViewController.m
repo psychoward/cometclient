@@ -6,20 +6,12 @@
 
 @implementation MainViewController
 
-@synthesize textView = m_textView,
-	textField = m_textField;
-
-- (void)dealloc
-{
-	[m_client release];
-	[super dealloc];
-}
 
 - (void)viewDidLoad
 {
 	if (m_client == nil)
 	{
-		m_client = [[DDCometClient alloc] initWithURL:[NSURL URLWithString:@"http://localhost:8080/cometd"]];
+		m_client = [[DDCometClient alloc] initWithURL:[NSURL URLWithString:@"http://localhost:8080/cometd-demo-3.0.5/cometd"]];
 		m_client.delegate = self;
 		[m_client scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
 		[m_client handshake];
@@ -28,7 +20,7 @@
 
 - (void)viewWillAppear:(BOOL)animated
 {
-	[m_textField becomeFirstResponder];
+	[self.textField becomeFirstResponder];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -40,16 +32,16 @@
 
 - (BOOL)textFieldShouldReturn:(UITextField *)textField
 {
-	NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:m_textField.text, @"chat", @"iPhone user", @"user", nil];
+	NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:self.textField.text, @"chat", @"iPhone user", @"user", nil];
 	[m_client publishData:data toChannel:@"/chat/demo"];
 	
-	m_textField.text = @"";
+	self.textField.text = @"";
 	return YES;
 }
 
 - (void)appendText:(NSString *)text
 {
-	m_textView.text = [m_textView.text stringByAppendingFormat:@"%@\n", text];
+	self.textView.text = [self.textView.text stringByAppendingFormat:@"%@\n", text];
 }
 
 #pragma mark -

@@ -5,8 +5,6 @@
 {
 @private
 	DDCometClient *m_client;
-	UITextView *m_textView;
-	UITextField *m_textField;
 }
 
 @property (nonatomic, assign) IBOutlet UITextView *textView;

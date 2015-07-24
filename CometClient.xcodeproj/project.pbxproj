@@ -84,6 +84,7 @@
 		46AFA52F13443B9900B4DCA4 /* bayeux.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = bayeux.html; sourceTree = "<group>"; };
 		46AFA53013443B9900B4DCA4 /* dojo.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = dojo.js; sourceTree = "<group>"; };
 		46AFA5311344450000B4DCA4 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
+		494B05031B6283D500C229EE /* DDCometClient.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = DDCometClient.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,6 +114,7 @@
 		46568F89132C01AC004086EE = {
 			isa = PBXGroup;
 			children = (
+				494B05031B6283D500C229EE /* DDCometClient.podspec */,
 				46AFA5311344450000B4DCA4 /* LICENSE */,
 				46AFA52E13443B7900B4DCA4 /* Documentation */,
 				46568FFB132C030B004086EE /* DDComet */,
