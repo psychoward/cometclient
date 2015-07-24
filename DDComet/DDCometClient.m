@@ -674,7 +674,8 @@ static void * const delegateKey = (void*)&delegateKey;
 			}
             if ([subscription.target respondsToSelector:subscription.selector]) 
 			{
-                objc_msgSend(subscription.target, subscription.selector, message);
+                void (*performSelectorWithObject)(id, SEL, id) = (void *)objc_msgSend;
+                performSelectorWithObject(subscription.target, subscription.selector, message);
             }
 //			[subscription.target performSelector:subscription.selector withObject:message];
         }
